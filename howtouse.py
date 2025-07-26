@@ -25,3 +25,4 @@ async def send_how_to_use(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text=msg,
             parse_mode="Markdown",
             disable_web_page_preview=True
+        )
