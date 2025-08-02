@@ -78,25 +78,29 @@ async def handle_latest_buttons(update: Update, context: ContextTypes.DEFAULT_TY
             links = "\n".join(data.get("links", []))
             audio = "Hindi + Multi Audio"
 
-            promo = (
-                "\n\n✨ 🔧 <b>𝐋𝐞𝐚𝐫𝐧 𝐓𝐨𝐨𝐥𝐬 & 𝐇𝐚𝐜𝐤𝐢𝐧𝐠 🧠</b>\n"
-                f"🔗 𝐉𝐨𝐢𝐧 𝐧𝐨𝐰 — <a href='https://t.me/oxAngry'>@oxAngry</a>"
+            # Caption with help info and video link (no preview)
+            caption = (
+                f"<b>{title}</b>\n\n"
+                f"🔊 Audio: {audio}\n\n"
+                f"{links}\n\n"
+                "😌 <b>दिक्कत आ रही है?</b>\n"
+                "🎬 <b>वीडियो देखो – सब सेट हो जाएगा!</b>\n"
+                "🔗 <b>लिंक नीचे है 👇</b>\n"
+                "🎥 https://t.me/cinepulsebot_official/25"
             )
-
-            caption = f"<b>{title}</b>\n\n🔊 Audio: {audio}\n\n{links}{promo}"
 
             try:
                 if poster:
                     if len(caption) > 1024:
                         await update.message.reply_photo(photo=poster)
-                        await update.message.reply_text(caption, parse_mode="HTML")
+                        await update.message.reply_text(caption, parse_mode="HTML", disable_web_page_preview=True)
                     else:
                         await update.message.reply_photo(photo=poster, caption=caption, parse_mode="HTML")
                 else:
-                    await update.message.reply_text(caption, parse_mode="HTML")
+                    await update.message.reply_text(caption, parse_mode="HTML", disable_web_page_preview=True)
             except Exception as e:
                 print(f"[❗] Image error for {title}: {e}")
-                await update.message.reply_text(caption, parse_mode="HTML")
+                await update.message.reply_text(caption, parse_mode="HTML", disable_web_page_preview=True)
             return
 
     await update.message.reply_text("❌ Invalid option. Please use the menu.")
