@@ -20,7 +20,7 @@ DATA_FILES = [
     "multipart_data.json",
 ]
 
-# ✅ Fix poster URLs for image compatibility
+# ✅ Fix poster URLs
 def fix_poster_url(url: str) -> str:
     if not url:
         return ""
@@ -33,7 +33,7 @@ def fix_poster_url(url: str) -> str:
         return url.replace("https://catbox.moe/", "https://files.catbox.moe/")
     return url
 
-# ✅ Load all data from JSON sources
+# ✅ Load JSON data
 def load_all_data():
     all_data = {}
     for file in DATA_FILES:
@@ -46,7 +46,7 @@ def load_all_data():
                 print(f"[❌] Failed to load {file}: {e}")
     return all_data
 
-# ✅ Core search logic using difflib
+# ✅ Search core
 def search_movie(query):
     data = load_all_data()
     matches = get_close_matches(query, list(data.keys()), n=1, cutoff=0.3)
@@ -60,10 +60,12 @@ def search_movie(query):
     audio = item.get("audio", "Hindi + Multi Audio")
     links = "\n".join(item.get("links", []))
 
-    # 🔧 Custom footer CTA
+    # ✅ Hindi support footer
     footer = (
-        "\n\n✨ 🔧 <b>𝐋𝐞𝐚𝐫𝐧 𝐓𝐨𝐨𝐥𝐬 & 𝐇𝐚𝐜𝐤𝐢𝐧𝐠 🧠</b>\n"
-        "🔗 𝐉𝐨𝐢𝐧 𝐧𝐨𝐰 — <a href='https://t.me/oxAngry'>@oxAngry</a>"
+        "\n\n😌 <b>दिक्कत आ रही है?</b>\n"
+        "🎬 <b>वीडियो देखो – सब सेट हो जाएगा!</b>\n"
+        "🔗 <b>लिंक नीचे है 👇</b>\n"
+        "🎥 https://t.me/cinepulsebot_official/25"
     )
 
     base = f"<b>{title}</b>\n🔊 Audio: {audio}\n\n{links}{footer}"
@@ -75,7 +77,7 @@ def search_movie(query):
 
     return title, poster, base
 
-# ✅ Main handler when user sends a search query
+# ✅ Search Handler
 async def search_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     query = update.message.text.strip()
@@ -84,14 +86,13 @@ async def search_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Please enter something to search.")
         return
 
-    # ✅ Log the search properly using user_id and username
+    # ✅ Log search
     try:
         log_search(query, user.id, user.username)
     except Exception as e:
         print(f"[⚠️] Logging search failed: {e}")
 
-
-    # ✅ Then do the actual search
+    # ✅ Search logic
     result = search_movie(query)
     if not result:
         await update.message.reply_text("❌ No results found. Try a different name.")
@@ -101,12 +102,21 @@ async def search_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         if poster:
-            await update.message.reply_photo(photo=poster, caption=caption, parse_mode="HTML")
+            await update.message.reply_photo(
+                photo=poster,
+                caption=caption,
+                parse_mode="HTML",
+                disable_web_page_preview=True  # ✅ No link preview
+            )
         else:
-            await update.message.reply_text(caption, parse_mode="HTML")
+            await update.message.reply_text(
+                caption,
+                parse_mode="HTML",
+                disable_web_page_preview=True
+            )
     except Exception as e:
         err = str(e).lower()
         print(f"[❗] Search error: {e}")
         if "forbidden" in err or "bot was blocked" in err or "unauthorized" in err:
             handle_bot_block(user.id)
-        await update.message.reply_text(caption[:4000], parse_mode="HTML")
+        await update.message.reply_text(caption[:4000], parse_mode="HTML", disable_web_page_preview=True)
