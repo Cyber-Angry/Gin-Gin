@@ -1,7 +1,7 @@
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes
 from utils import load_json
-from logger import log_click  # Optional
+from logger import log_click  # ✅ Stylish click logger
 
 # Load data
 eighteenplus_data = load_json("eighteenplus_data.json")
@@ -74,31 +74,34 @@ async def handle_eighteen_buttons(update: Update, context: ContextTypes.DEFAULT_
     if text in eighteenplus_data:
         data = eighteenplus_data[text]
 
-        log_click(user, text)  # Optional logging
+        log_click(user, text)  # ✅ Logging user click
 
         poster = data.get("poster", "")
         links = "\n".join(data.get("links", []))
         audio = "Hindi + Multi Audio"
 
-        promo = (
-            "\n\n✨ 🔧 <b>𝐋𝐞𝐚𝐫𝐧 𝐓𝐨𝐨𝐥𝐬 & 𝐇𝐚𝐜𝐤𝐢𝐧𝐠  🧠</b>\n"
-            f"🔗 𝐉𝐨𝐢𝐧 𝐧𝐨𝐰 — <a href='https://t.me/oxAngry'>@oxAngry</a>"
+        caption = (
+            f"<b>{text}</b>\n\n"
+            f"🔊 Audio: {audio}\n\n"
+            f"{links}\n\n"
+            "😌 <b>दिक्कत आ रही है?</b>\n"
+            "🎬 <b>वीडियो देखो – सब सेट हो जाएगा!</b>\n"
+            "🔗 <b>लिंक नीचे है 👇</b>\n"
+            "🎥 https://t.me/cinepulsebot_official/25"
         )
-
-        caption = f"<b>{text}</b>\n\n🔊 Audio: {audio}\n\n{links}{promo}"
 
         try:
             if poster:
                 if len(caption) > 1024:
                     await update.message.reply_photo(photo=poster)
-                    await update.message.reply_text(caption, parse_mode="HTML")
+                    await update.message.reply_text(caption, parse_mode="HTML", disable_web_page_preview=True)
                 else:
                     await update.message.reply_photo(photo=poster, caption=caption, parse_mode="HTML")
             else:
-                await update.message.reply_text(caption, parse_mode="HTML")
+                await update.message.reply_text(caption, parse_mode="HTML", disable_web_page_preview=True)
         except Exception as e:
             print(f"[❗] Image error for {text}: {e}")
-            await update.message.reply_text(caption, parse_mode="HTML")
+            await update.message.reply_text(caption, parse_mode="HTML", disable_web_page_preview=True)
         return
 
     await update.message.reply_text("❌ Invalid option. Please use the menu.")
