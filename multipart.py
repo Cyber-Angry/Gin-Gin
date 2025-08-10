@@ -1,7 +1,7 @@
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes
 from utils import load_json
-from logger import log_click  # ✅ Logging enabled
+from logger import log_click  # ✅ Optional if logging is used
 
 # Load Multipart data
 multipart_data = load_json("multipart_data.json")
@@ -34,16 +34,13 @@ async def show_multiparts(update: Update, context: ContextTypes.DEFAULT_TYPE, pa
     keyboard.append(["⏮ Back", "⏭ Next"])
     keyboard.append(["🏠 Main Menu"])
 
-    await update.message.reply_text(
-        "📦🍿 𝐌𝐮𝐥𝐭𝐢𝐩𝐚𝐫𝐭 𝐌𝐨𝐯𝐢𝐞𝐬 𝐂𝐨𝐥𝐥𝐞𝐜𝐭𝐢𝐨𝐧",
-        reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
-    )
+    await update.message.reply_text("📦🍿 𝐌𝐮𝐥𝐭𝐢𝐩𝐚𝐫𝐭 𝐌𝐨𝐯𝐢𝐞𝐬 𝐂𝐨𝐥𝐥𝐞𝐜𝐭𝐢𝐨𝐧", reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True))
 
 
 # Handle Multipart Selection
 async def handle_multipart_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.strip()
-    user = update.effective_user  # ✅ Logging
+    user = update.effective_user  # ✅ For click logging
     page = context.user_data.get("multipart_page", 1)
     items = [{"title": title, "emoji": multipart_data[title].get("emoji", "")} for title in multipart_data]
     total_pages = (len(items) - 1) // 30 + 1
@@ -74,17 +71,15 @@ async def handle_multipart_buttons(update: Update, context: ContextTypes.DEFAULT
         if text == expected_btn:
             data = multipart_data[title]
 
-            log_click(user, title)  # ✅ Log the click
+            log_click(user, title)  # ✅ Optional logging
 
             poster = data.get("poster", "")
             links = "\n".join(data.get("links", []))
             audio = "Hindi + Multi Audio"
 
             promo = (
-                "\n\n😌 <b>दिक्कत आ रही है?</b>\n"
-                "🎬 <b>वीडियो देखो – सब सेट हो जाएगा!</b>\n"
-                "🔗 <b>लिंक नीचे है 👇</b>\n"
-                "🎥 https://t.me/cinepulsebot_official/25"
+                "\n\n✨ 🔧 <b>𝐋𝐞𝐚𝐫𝐧 𝐓𝐨𝐨𝐥𝐬 & 𝐇𝐚𝐜𝐤𝐢𝐧𝐠  🧠</b>\n"
+                f"🔗 𝐉𝐨𝐢𝐧 𝐧𝐨𝐰 — <a href='https://t.me/oxAngry'>@oxAngry</a>"
             )
 
             caption = f"<b>{title}</b>\n\n🔊 Audio: {audio}\n\n{links}{promo}"
@@ -93,25 +88,14 @@ async def handle_multipart_buttons(update: Update, context: ContextTypes.DEFAULT
                 if poster:
                     if len(caption) > 1024:
                         await update.message.reply_photo(photo=poster)
-                        await update.message.reply_text(
-                            caption, parse_mode="HTML", disable_web_page_preview=True
-                        )
+                        await update.message.reply_text(caption, parse_mode="HTML")
                     else:
-                        await update.message.reply_photo(
-                            photo=poster,
-                            caption=caption,
-                            parse_mode="HTML",
-                            disable_web_page_preview=True,
-                        )
+                        await update.message.reply_photo(photo=poster, caption=caption, parse_mode="HTML")
                 else:
-                    await update.message.reply_text(
-                        caption, parse_mode="HTML", disable_web_page_preview=True
-                    )
+                    await update.message.reply_text(caption, parse_mode="HTML")
             except Exception as e:
                 print(f"[❗] Image error for {title}: {e}")
-                await update.message.reply_text(
-                    caption, parse_mode="HTML", disable_web_page_preview=True
-                )
+                await update.message.reply_text(caption, parse_mode="HTML")
             return
 
     await update.message.reply_text("❌ Invalid option. Please use the menu.")
