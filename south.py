@@ -1,12 +1,12 @@
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes
 from utils import load_json
-from logger import log_click  # ✅ Logging
+from logger import log_click  # ✅ Stylish logging import added
 
-# Load South Indian movie data
+# Load South Movies data
 south_data = load_json("south_data.json")
 
-# Show South Indian Movies in 15x2 layout
+# Show South Movies in 15x2 layout
 async def show_south(update: Update, context: ContextTypes.DEFAULT_TYPE, page=1):
     context.user_data["south_page"] = page
     items = [{"title": title, "emoji": south_data[title].get("emoji", "")} for title in south_data]
@@ -39,10 +39,10 @@ async def show_south(update: Update, context: ContextTypes.DEFAULT_TYPE, page=1)
         reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     )
 
-# Handle South Indian movie selection
+# Handle South Movies selection
 async def handle_south_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.strip()
-    user = update.effective_user
+    user = update.effective_user  # ✅ Needed for logging
     page = context.user_data.get("south_page", 1)
     items = [{"title": title, "emoji": south_data[title].get("emoji", "")} for title in south_data]
     total_pages = (len(items) - 1) // 30 + 1
@@ -67,22 +67,20 @@ async def handle_south_buttons(update: Update, context: ContextTypes.DEFAULT_TYP
         await update.message.reply_text("🏠 Back to Main Menu:", reply_markup=reply_markup)
         return
 
-    # Match button text
+    # Title match
     for title in south_data:
         expected_btn = f"{title} {south_data[title].get('emoji', '')}".strip()
         if text == expected_btn:
             data = south_data[title]
-            log_click(user, title)
+            log_click(user, title)  # ✅ Log the click
 
             poster = data.get("poster", "")
             links = "\n".join(data.get("links", []))
             audio = "Hindi + Multi Audio"
 
             promo = (
-                "\n\n😌 <b>दिक्कत आ रही है?</b>\n"
-                "🎬 <b>वीडियो देखो – सब सेट हो जाएगा!</b>\n"
-                "🔗 <b>लिंक नीचे है 👇</b>\n"
-                "🎥 https://t.me/cinepulsebot_official/25"
+                "\n\n✨ 🔧 <b>𝐋𝐢𝐧𝐤 𝐁𝐚𝐜𝐤 𝐏𝐫𝐨𝐛𝐥𝐞𝐦 𝐅𝐢𝐱 🚀</b>\n"
+                f"🔗 𝐋𝐢𝐧𝐤 — <a href='https://t.me/cinepulsebot_official/74'>Click Here</a>"
             )
 
             caption = f"<b>{title}</b>\n\n🔊 Audio: {audio}\n\n{links}{promo}"
@@ -91,25 +89,14 @@ async def handle_south_buttons(update: Update, context: ContextTypes.DEFAULT_TYP
                 if poster:
                     if len(caption) > 1024:
                         await update.message.reply_photo(photo=poster)
-                        await update.message.reply_text(
-                            caption, parse_mode="HTML", disable_web_page_preview=True
-                        )
+                        await update.message.reply_text(caption, parse_mode="HTML")
                     else:
-                        await update.message.reply_photo(
-                            photo=poster,
-                            caption=caption,
-                            parse_mode="HTML",
-                            disable_web_page_preview=True,
-                        )
+                        await update.message.reply_photo(photo=poster, caption=caption, parse_mode="HTML")
                 else:
-                    await update.message.reply_text(
-                        caption, parse_mode="HTML", disable_web_page_preview=True
-                    )
+                    await update.message.reply_text(caption, parse_mode="HTML")
             except Exception as e:
                 print(f"[❗] Image error for {title}: {e}")
-                await update.message.reply_text(
-                    caption, parse_mode="HTML", disable_web_page_preview=True
-                )
+                await update.message.reply_text(caption, parse_mode="HTML")
             return
 
     await update.message.reply_text("❌ Invalid option. Please use the menu.")
